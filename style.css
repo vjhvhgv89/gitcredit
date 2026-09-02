@@ -2742,22 +2742,48 @@ textarea.form-control {
     height: 4px;
   }
 
-  /* Alerts & Settlement Box on mobile */
+  /* Settlement & Alerts Box on Mobile (Full Width Span) */
+  .summary-card.card-activity,
   .summary-card.card-alerts {
-    grid-column: span 2;
-    padding: 12px 14px;
+    grid-column: span 2 !important;
+    padding: 14px 16px;
+    width: 100%;
   }
 
-  .alerts-grid {
+  .activity-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
-    margin-top: 4px;
+    margin-top: 8px;
+    width: 100%;
   }
 
-  .alert-stat-card {
+  .activity-item {
+    background: var(--bg-input);
     padding: 8px 10px;
     border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .activity-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .activity-val {
+    font-size: 0.95rem;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* Controls & Search */
