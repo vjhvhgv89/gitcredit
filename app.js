@@ -152,7 +152,6 @@
     cloudSyncBadge: document.getElementById('cloudSyncBadge'),
     cloudPulseDot: document.getElementById('cloudPulseDot'),
     cloudSyncText: document.getElementById('cloudSyncText'),
-    currencySelect: document.getElementById('currencySelect'),
     currencyPrefix: document.getElementById('currencyPrefix'),
     currencyPrefixPaid: document.getElementById('currencyPrefixPaid'),
     currencyPrefixMonthly: document.getElementById('currencyPrefixMonthly'),
@@ -468,10 +467,7 @@
   function loadSettings() {
     const savedTheme = localStorage.getItem(STORAGE_KEY_THEME) || 'dark';
     setTheme(savedTheme);
-
-    const savedCurrency = localStorage.getItem(STORAGE_KEY_CURRENCY) || '₱';
-    state.currency = savedCurrency;
-    elements.currencySelect.value = savedCurrency;
+    state.currency = '₱';
     updateCurrencyDisplay();
   }
 
@@ -2549,15 +2545,6 @@
       const nextTheme = state.theme === 'dark' ? 'light' : 'dark';
       setTheme(nextTheme);
       showToast(`Switched to ${nextTheme} mode`, 'info');
-    });
-
-    // Currency Switcher
-    elements.currencySelect.addEventListener('change', (e) => {
-      state.currency = e.target.value;
-      localStorage.setItem(STORAGE_KEY_CURRENCY, state.currency);
-      updateCurrencyDisplay();
-      render();
-      showToast(`Currency changed to ${state.currency}`, 'info');
     });
 
     // Tabs

@@ -2476,25 +2476,19 @@ textarea.form-control {
 
   .nav-actions {
     display: grid;
-    grid-template-columns: 1fr auto auto auto;
+    grid-template-columns: 1fr auto auto;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     width: 100%;
   }
 
   .cloud-sync-badge {
-    padding: 6px 10px;
-    font-size: 0.74rem;
+    padding: 6px 12px;
+    font-size: 0.76rem;
     gap: 6px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  .currency-picker .select-input {
-    padding: 6px 8px;
-    font-size: 0.82rem;
-    font-weight: 700;
   }
 
   .btn-icon {
