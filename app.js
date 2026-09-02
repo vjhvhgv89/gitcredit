@@ -397,19 +397,14 @@
           cloudRecords.push({ id: doc.id, ...doc.data() });
         });
 
-        // If cloud has records, sync to local state
-        if (cloudRecords.length > 0) {
-          state.credits = cloudRecords;
-          try {
-            localStorage.setItem(STORAGE_KEY_CREDITS, JSON.stringify(state.credits));
-          } catch (e) {}
-          updateCategoryDropdown();
-          render();
-          updateCloudStatus('connected', 'Cloud Synced');
-        } else if (state.credits.length > 0) {
-          // Push initial local records to cloud
-          syncAllLocalRecordsToCloud();
-        }
+        // Authoritative Cloud Sync: state matches Firestore exactly
+        state.credits = cloudRecords;
+        try {
+          localStorage.setItem(STORAGE_KEY_CREDITS, JSON.stringify(state.credits));
+        } catch (e) {}
+        updateCategoryDropdown();
+        render();
+        updateCloudStatus('connected', 'Cloud Synced');
       }, (error) => {
         console.warn('Firestore snapshot listener:', error);
         updateCloudStatus('offline', 'Local Cache');
