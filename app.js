@@ -2496,10 +2496,23 @@
   function resetAllData() {
     if (confirm('WARNING: Are you sure you want to delete ALL credit records, payments, and receipt images? This cannot be undone.')) {
       state.credits = [];
-      saveRecords();
+      localStorage.removeItem(STORAGE_KEY_CREDITS);
+      if (db) {
+        updateCloudStatus('syncing', 'Clearing Cloud...');
+        db.collection('credits').get().then(snapshot => {
+          const batch = db.batch();
+          snapshot.docs.forEach(doc => batch.delete(doc.ref));
+          return batch.commit();
+        }).then(() => {
+          updateCloudStatus('connected', 'Cloud Synced');
+        }).catch(err => {
+          console.warn('Clear firestore notice:', err);
+          updateCloudStatus('connected', 'Cloud Synced');
+        });
+      }
       updateCategoryDropdown();
       render();
-      showToast('All data cleared', 'info');
+      showToast('All credit records and payments have been deleted', 'info');
       elements.dataModal.classList.add('hidden');
     }
   }
