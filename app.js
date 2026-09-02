@@ -149,6 +149,9 @@
     themeToggleBtn: document.getElementById('themeToggleBtn'),
     themeIconSun: document.getElementById('themeIconSun'),
     themeIconMoon: document.getElementById('themeIconMoon'),
+    cloudSyncBadge: document.getElementById('cloudSyncBadge'),
+    cloudPulseDot: document.getElementById('cloudPulseDot'),
+    cloudSyncText: document.getElementById('cloudSyncText'),
     currencySelect: document.getElementById('currencySelect'),
     currencyPrefix: document.getElementById('currencyPrefix'),
     currencyPrefixPaid: document.getElementById('currencyPrefixPaid'),
@@ -343,6 +346,119 @@
     toastContainer: document.getElementById('toastContainer')
   };
 
+  // --- Firebase Cloud Firestore Configuration ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyA2bIxR6FBbgHGBy8rzu5jEE4g5FyxELgk",
+    authDomain: "gitcredit.firebaseapp.com",
+    projectId: "gitcredit",
+    storageBucket: "gitcredit.firebasestorage.app",
+    messagingSenderId: "872210707513",
+    appId: "1:872210707513:web:4060da3df03e211a8b09e8",
+    measurementId: "G-Q4Y4XQL405"
+  };
+
+  let db = null;
+  let isCloudConnected = false;
+
+  function updateCloudStatus(status, text) {
+    if (!elements.cloudSyncBadge) return;
+    if (elements.cloudSyncText) elements.cloudSyncText.textContent = text;
+    if (elements.cloudPulseDot) {
+      elements.cloudPulseDot.className = 'cloud-pulse-dot ' + (status === 'syncing' ? 'syncing' : (status === 'offline' ? 'offline' : ''));
+    }
+    elements.cloudSyncBadge.title = `Firebase Firestore (${firebaseConfig.projectId}): ${text}`;
+  }
+
+  function initFirebase() {
+    try {
+      if (typeof firebase !== 'undefined' && firebase.initializeApp) {
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
+        db = firebase.firestore();
+        isCloudConnected = true;
+        updateCloudStatus('connected', 'Cloud Synced');
+        setupFirestoreRealtimeListener();
+      } else {
+        updateCloudStatus('offline', 'Local Mode');
+      }
+    } catch (e) {
+      console.warn('Firebase init:', e);
+      updateCloudStatus('offline', 'Local Mode');
+    }
+  }
+
+  function setupFirestoreRealtimeListener() {
+    if (!db) return;
+    try {
+      db.collection('credits').onSnapshot((snapshot) => {
+        const cloudRecords = [];
+        snapshot.forEach(doc => {
+          cloudRecords.push({ id: doc.id, ...doc.data() });
+        });
+
+        // If cloud has records, sync to local state
+        if (cloudRecords.length > 0) {
+          state.credits = cloudRecords;
+          try {
+            localStorage.setItem(STORAGE_KEY_CREDITS, JSON.stringify(state.credits));
+          } catch (e) {}
+          updateCategoryDropdown();
+          render();
+          updateCloudStatus('connected', 'Cloud Synced');
+        } else if (state.credits.length > 0) {
+          // Push initial local records to cloud
+          syncAllLocalRecordsToCloud();
+        }
+      }, (error) => {
+        console.warn('Firestore snapshot listener:', error);
+        updateCloudStatus('offline', 'Local Cache');
+      });
+    } catch (err) {
+      console.warn('Firestore listener setup error:', err);
+    }
+  }
+
+  async function syncRecordToCloud(rec) {
+    if (!db) return;
+    try {
+      updateCloudStatus('syncing', 'Syncing...');
+      await db.collection('credits').doc(rec.id).set(rec);
+      updateCloudStatus('connected', 'Cloud Synced');
+    } catch (err) {
+      console.error('Error syncing record to Firestore:', err);
+      updateCloudStatus('offline', 'Local Cache');
+    }
+  }
+
+  async function deleteRecordFromCloud(recordId) {
+    if (!db) return;
+    try {
+      updateCloudStatus('syncing', 'Syncing...');
+      await db.collection('credits').doc(recordId).delete();
+      updateCloudStatus('connected', 'Cloud Synced');
+    } catch (err) {
+      console.error('Error deleting record from Firestore:', err);
+      updateCloudStatus('offline', 'Local Cache');
+    }
+  }
+
+  async function syncAllLocalRecordsToCloud() {
+    if (!db || state.credits.length === 0) return;
+    try {
+      updateCloudStatus('syncing', 'Syncing...');
+      const batch = db.batch();
+      state.credits.forEach(rec => {
+        const ref = db.collection('credits').doc(rec.id);
+        batch.set(ref, rec);
+      });
+      await batch.commit();
+      updateCloudStatus('connected', 'Cloud Synced');
+    } catch (e) {
+      console.warn('Batch sync notice:', e);
+    }
+  }
+
   // --- Initialization ---
   function init() {
     loadSettings();
@@ -350,6 +466,7 @@
     setupEventListeners();
     updateCategoryDropdown();
     render();
+    initFirebase();
   }
 
   // --- Load & Save Settings ---
@@ -390,7 +507,6 @@
     if (raw) {
       try {
         const parsed = JSON.parse(raw);
-        // Clean out starter demo records if present
         const userRecords = Array.isArray(parsed) 
           ? parsed.filter(rec => !rec.id.startsWith('cp_101') && !rec.id.startsWith('cp_102') && !rec.id.startsWith('cp_103') && !rec.id.startsWith('cp_104'))
           : [];
@@ -413,6 +529,10 @@
     } catch (e) {
       console.error('LocalStorage quota exceeded', e);
       showToast('Storage limit reached! Try removing large image files.', 'error');
+    }
+    // Sync to Cloud
+    if (db) {
+      syncAllLocalRecordsToCloud();
     }
   }
 
@@ -2264,11 +2384,13 @@
 
   function confirmDelete() {
     if (!state.deleteTargetId) return;
-    const idx = state.credits.findIndex(r => r.id === state.deleteTargetId);
+    const targetId = state.deleteTargetId;
+    const idx = state.credits.findIndex(r => r.id === targetId);
     if (idx !== -1) {
       const name = state.credits[idx].personName;
       state.credits.splice(idx, 1);
       saveRecords();
+      deleteRecordFromCloud(targetId);
       updateCategoryDropdown();
       render();
       showToast(`Deleted credit record for ${name}`, 'info');

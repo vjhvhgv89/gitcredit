@@ -31,6 +31,12 @@
       </div>
 
       <div class="nav-actions">
+        <!-- Cloud Sync Status Indicator -->
+        <div class="cloud-sync-badge" id="cloudSyncBadge" title="Connected to Firebase Cloud Firestore (gitcredit)">
+          <span class="cloud-pulse-dot" id="cloudPulseDot"></span>
+          <span class="cloud-sync-text" id="cloudSyncText">Connecting...</span>
+        </div>
+
         <!-- Currency Selector -->
         <div class="currency-picker" title="Select Currency">
           <label for="currencySelect" class="sr-only">Currency</label>
@@ -921,6 +927,10 @@
 
   <!-- Toast Notification Container -->
   <div class="toast-container no-print" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- Scripts -->
   <script src="app.js"></script>
