@@ -105,7 +105,7 @@
   // --- State Management ---
   const state = {
     credits: [],
-    currency: '$',
+    currency: '₱',
     theme: 'dark',
     filterType: 'ALL',      // ALL | LENT | BORROWED
     filterStatus: 'ALL',    // ALL | ACTIVE | PARTIAL | PAID | OVERDUE
@@ -469,7 +469,7 @@
     const savedTheme = localStorage.getItem(STORAGE_KEY_THEME) || 'dark';
     setTheme(savedTheme);
 
-    const savedCurrency = localStorage.getItem(STORAGE_KEY_CURRENCY) || '$';
+    const savedCurrency = localStorage.getItem(STORAGE_KEY_CURRENCY) || '₱';
     state.currency = savedCurrency;
     elements.currencySelect.value = savedCurrency;
     updateCurrencyDisplay();
