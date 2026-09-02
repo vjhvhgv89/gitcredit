@@ -2401,7 +2401,7 @@ textarea.form-control {
 }
 
 /* ==========================================================
-   Responsive Breakpoints
+   Mobile & Phone Responsive Styles (Optimized for Touch)
    ========================================================== */
 @media (max-width: 900px) {
   .record-card {
@@ -2411,6 +2411,7 @@ textarea.form-control {
       "amount status"
       "actions actions";
     gap: 14px;
+    padding: 16px;
   }
 
   .record-icon-col { grid-area: icon; }
@@ -2421,48 +2422,122 @@ textarea.form-control {
     grid-area: actions;
     justify-content: flex-start;
     border-top: 1px solid var(--border-color);
-    padding-top: 10px;
+    padding-top: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 }
 
 @media (max-width: 600px) {
+  /* Prevent iOS zoom on input focus */
+  input, select, textarea, .form-control {
+    font-size: 16px !important;
+  }
+
   .app-container {
-    padding: 14px 12px 40px;
-    gap: 18px;
+    padding: 10px 10px 48px;
+    gap: 14px;
   }
 
+  /* Compact Top Navigation */
   .top-nav {
-    padding: 12px 16px;
+    padding: 10px 12px;
+    gap: 10px;
+    flex-direction: column;
+    align-items: stretch;
   }
 
+  .nav-brand {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .brand-text h1 {
+    font-size: 1.2rem;
+  }
+
+  .brand-subtitle {
+    font-size: 0.7rem;
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .cloud-sync-badge {
+    padding: 4px 8px;
+    font-size: 0.72rem;
+    gap: 5px;
+  }
+
+  .currency-picker .select-input {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+  }
+
+  .btn-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .btn-compact {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .btn-primary {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+  }
+
+  /* Summary Section Cards */
   .summary-section {
     grid-template-columns: 1fr;
-  }
-
-  .form-row {
-    flex-direction: column;
     gap: 12px;
   }
 
-  .type-toggle-group {
-    grid-template-columns: 1fr;
+  .summary-card {
+    padding: 16px;
+  }
+
+  .summary-val {
+    font-size: 1.5rem;
+  }
+
+  /* Controls & Search */
+  .controls-bar {
+    padding: 12px;
+    gap: 10px;
   }
 
   .controls-top {
     flex-direction: column;
     align-items: stretch;
+    gap: 8px;
   }
 
   .tab-group {
     width: 100%;
-    justify-content: space-between;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .tab-group::-webkit-scrollbar {
+    display: none;
   }
 
   .tab-btn {
-    flex: 1;
+    flex: 1 0 auto;
     justify-content: center;
-    padding: 6px 8px;
-    font-size: 0.78rem;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    white-space: nowrap;
   }
 
   .search-box {
@@ -2470,26 +2545,211 @@ textarea.form-control {
     max-width: 100%;
   }
 
-  .details-summary-box {
-    grid-template-columns: 1fr;
+  .controls-bottom {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
   }
 
+  .filter-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .filter-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .filter-item label {
+    font-size: 0.72rem;
+  }
+
+  .select-sm {
+    width: 100%;
+    padding: 6px 8px;
+    font-size: 0.82rem;
+  }
+
+  .sort-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .sort-group .select-sm {
+    width: 100%;
+  }
+
+  /* Record Cards for Mobile Touch */
+  .record-card {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "icon main"
+      "amount amount"
+      "status status"
+      "actions actions";
+    gap: 10px;
+    padding: 14px;
+    border-radius: var(--radius-md);
+  }
+
+  .record-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 0.95rem;
+  }
+
+  .record-person {
+    font-size: 1.05rem;
+  }
+
+  .record-remaining {
+    font-size: 1.35rem;
+  }
+
+  .record-sub-meta {
+    font-size: 0.75rem;
+    gap: 4px;
+  }
+
+  .record-status-col {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .record-actions-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto auto;
+    gap: 6px;
+    width: 100%;
+    padding-top: 10px;
+  }
+
+  .record-actions-col .btn-action {
+    padding: 8px 10px;
+    font-size: 0.82rem;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Modals as Bottom-Sheets on Phone */
+  .modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-dialog {
+    width: 100%;
+    max-width: 100%;
+    max-height: 92vh;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
+    margin: 0;
+    padding: 0;
+  }
+
+  .modal-header {
+    padding: 14px 18px;
+  }
+
+  .modal-body {
+    padding: 16px 18px;
+    max-height: calc(92vh - 120px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-footer {
+    padding: 12px 18px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .payoff-stats-box {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .details-summary-box {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  /* Proof & Share Actions on Mobile */
   .voucher-parties {
     grid-template-columns: 1fr;
+    gap: 8px;
     text-align: center;
   }
 
   .party-arrow {
     transform: rotate(90deg);
+    padding: 2px 0;
+  }
+
+  .share-footer {
+    width: 100%;
   }
 
   .share-actions-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
     width: 100%;
-    justify-content: stretch;
   }
 
   .share-actions-group button {
-    flex: 1;
+    width: 100%;
     justify-content: center;
+    padding: 10px 8px;
+    font-size: 0.8rem;
+  }
+
+  .share-actions-group #printReceiptBtn {
+    grid-column: span 2;
+    padding: 12px;
+  }
+
+  .payment-log-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .payment-log-item .flex-align-center {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 380px) {
+  .record-actions-col {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .share-actions-group {
+    grid-template-columns: 1fr;
+  }
+
+  .share-actions-group #printReceiptBtn {
+    grid-column: span 1;
   }
 }
