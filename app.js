@@ -7,6 +7,8 @@
   'use strict';
 
   // --- Constants & Storage Keys ---
+  const MASTER_PASSWORD = 'walleencredit';
+  const STORAGE_KEY_AUTH = 'creditpulse_authenticated_v1';
   const STORAGE_KEY_CREDITS = 'creditpulse_records_v1';
   const STORAGE_KEY_THEME = 'creditpulse_theme';
   const STORAGE_KEY_CURRENCY = 'creditpulse_currency';
@@ -146,6 +148,16 @@
 
   // --- DOM Elements ---
   const elements = {
+    // Security Passcode Lock
+    authLockScreen: document.getElementById('authLockScreen'),
+    authForm: document.getElementById('authForm'),
+    authPasswordInput: document.getElementById('authPasswordInput'),
+    toggleAuthPasswordBtn: document.getElementById('toggleAuthPasswordBtn'),
+    eyeShowIcon: document.getElementById('eyeShowIcon'),
+    eyeHideIcon: document.getElementById('eyeHideIcon'),
+    authErrorMsg: document.getElementById('authErrorMsg'),
+    lockAppBtn: document.getElementById('lockAppBtn'),
+
     themeToggleBtn: document.getElementById('themeToggleBtn'),
     themeIconSun: document.getElementById('themeIconSun'),
     themeIconMoon: document.getElementById('themeIconMoon'),
@@ -453,8 +465,70 @@
     }
   }
 
+  // --- Security Passcode Authentication ---
+  function checkAuthentication() {
+    if (!elements.authLockScreen) return;
+    const isAuth = sessionStorage.getItem(STORAGE_KEY_AUTH) === 'true';
+    if (isAuth) {
+      elements.authLockScreen.classList.add('unlocked');
+    } else {
+      elements.authLockScreen.classList.remove('unlocked');
+      if (elements.authPasswordInput) {
+        setTimeout(() => elements.authPasswordInput.focus(), 300);
+      }
+    }
+  }
+
+  function handleAuthSubmit(e) {
+    if (e) e.preventDefault();
+    const entered = elements.authPasswordInput ? elements.authPasswordInput.value : '';
+    if (entered === MASTER_PASSWORD) {
+      sessionStorage.setItem(STORAGE_KEY_AUTH, 'true');
+      if (elements.authErrorMsg) elements.authErrorMsg.classList.add('hidden');
+      if (elements.authLockScreen) elements.authLockScreen.classList.add('unlocked');
+      showToast('Welcome to CreditPulse! Unlocked.', 'success');
+    } else {
+      if (elements.authErrorMsg) elements.authErrorMsg.classList.remove('hidden');
+      if (elements.authPasswordInput) {
+        elements.authPasswordInput.classList.add('shake');
+        elements.authPasswordInput.value = '';
+        elements.authPasswordInput.focus();
+        setTimeout(() => {
+          if (elements.authPasswordInput) elements.authPasswordInput.classList.remove('shake');
+        }, 450);
+      }
+    }
+  }
+
+  function lockApp() {
+    sessionStorage.removeItem(STORAGE_KEY_AUTH);
+    if (elements.authPasswordInput) elements.authPasswordInput.value = '';
+    if (elements.authErrorMsg) elements.authErrorMsg.classList.add('hidden');
+    if (elements.authLockScreen) elements.authLockScreen.classList.remove('unlocked');
+    if (elements.authPasswordInput) {
+      setTimeout(() => elements.authPasswordInput.focus(), 300);
+    }
+    showToast('Tracker locked', 'info');
+  }
+
+  function toggleAuthPasswordVisibility() {
+    if (!elements.authPasswordInput) return;
+    const isPass = elements.authPasswordInput.type === 'password';
+    elements.authPasswordInput.type = isPass ? 'text' : 'password';
+    if (elements.eyeShowIcon && elements.eyeHideIcon) {
+      if (isPass) {
+        elements.eyeShowIcon.classList.add('hidden');
+        elements.eyeHideIcon.classList.remove('hidden');
+      } else {
+        elements.eyeShowIcon.classList.remove('hidden');
+        elements.eyeHideIcon.classList.add('hidden');
+      }
+    }
+  }
+
   // --- Initialization ---
   function init() {
+    checkAuthentication();
     loadSettings();
     loadRecords();
     setupEventListeners();
@@ -2540,6 +2614,17 @@
 
   // --- Event Listeners Setup ---
   function setupEventListeners() {
+    // Security Lock Screen Listeners
+    if (elements.authForm) {
+      elements.authForm.addEventListener('submit', handleAuthSubmit);
+    }
+    if (elements.toggleAuthPasswordBtn) {
+      elements.toggleAuthPasswordBtn.addEventListener('click', toggleAuthPasswordVisibility);
+    }
+    if (elements.lockAppBtn) {
+      elements.lockAppBtn.addEventListener('click', lockApp);
+    }
+
     // Theme Toggle
     elements.themeToggleBtn.addEventListener('click', () => {
       const nextTheme = state.theme === 'dark' ? 'light' : 'dark';
