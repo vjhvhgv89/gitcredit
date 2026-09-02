@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CreditPulse — Smart Personal Credit & Loan Tracker</title>
+  <meta name="description" content="A simple, elegant, and powerful personal credit and debt tracker to manage money lent, borrowed, due dates, partial payments, and payment proof receipts.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- App Container -->
+  <div class="app-container">
+    
+    <!-- Top Navigation Bar -->
+    <header class="top-nav no-print">
+      <div class="nav-brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+            <line x1="2" y1="10" x2="22" y2="10"></line>
+            <line x1="6" y1="15" x2="10" y2="15"></line>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>CreditPulse</h1>
+          <span class="brand-subtitle">Smart Credit Tracker</span>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <!-- Currency Selector -->
+        <div class="currency-picker" title="Select Currency">
+          <label for="currencySelect" class="sr-only">Currency</label>
+          <select id="currencySelect" class="select-input">
+            <option value="$" selected>USD ($)</option>
+            <option value="₱">PHP (₱)</option>
+            <option value="€">EUR (€)</option>
+            <option value="£">GBP (£)</option>
+            <option value="¥">JPY (¥)</option>
+            <option value="₹">INR (₹)</option>
+            <option value="C$">CAD (C$)</option>
+            <option value="A$">AUD (A$)</option>
+            <option value="S$">SGD (S$)</option>
+          </select>
+        </div>
+
+        <!-- Theme Toggle -->
+        <button id="themeToggleBtn" class="btn-icon" aria-label="Toggle Theme" title="Switch Theme">
+          <svg id="themeIconSun" class="theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg id="themeIconMoon" class="theme-icon hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <!-- Export/Import Menu Button -->
+        <button id="dataMenuBtn" class="btn-secondary btn-compact" title="Backup & Restore">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Data</span>
+        </button>
+
+        <!-- New Credit Entry Button -->
+        <button id="openAddModalBtn" class="btn-primary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Add Credit</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content no-print">
+      
+      <!-- Financial Summary Dashboard Cards -->
+      <section class="summary-section" aria-label="Financial Summary">
+        
+        <!-- Total Lent (Receivable) -->
+        <div class="summary-card card-lent">
+          <div class="card-header">
+            <div class="card-meta">
+              <span class="card-label">Money Lent (Receivable)</span>
+              <span class="card-badge" id="badgeLentCount">0 active</span>
+            </div>
+            <div class="card-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+              </svg>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-amount" id="totalLentAmount">$0.00</div>
+            <div class="card-subtext">
+              <span>Total original: <strong id="totalLentOriginal">$0.00</strong></span>
+            </div>
+          </div>
+          <div class="card-progress-bar">
+            <div class="progress-fill lent-fill" id="lentProgressFill" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Total Borrowed (Payable) -->
+        <div class="summary-card card-borrowed">
+          <div class="card-header">
+            <div class="card-meta">
+              <span class="card-label">Money Borrowed (Payable)</span>
+              <span class="card-badge" id="badgeBorrowedCount">0 active</span>
+            </div>
+            <div class="card-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="17" y1="7" x2="7" y2="17"></line>
+                <polyline points="17 17 7 17 7 7"></polyline>
+              </svg>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-amount" id="totalBorrowedAmount">$0.00</div>
+            <div class="card-subtext">
+              <span>Total original: <strong id="totalBorrowedOriginal">$0.00</strong></span>
+            </div>
+          </div>
+          <div class="card-progress-bar">
+            <div class="progress-fill borrowed-fill" id="borrowedProgressFill" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Net Balance -->
+        <div class="summary-card card-net">
+          <div class="card-header">
+            <div class="card-meta">
+              <span class="card-label">Net Balance Position</span>
+              <span class="card-badge" id="netStatusBadge">Balanced</span>
+            </div>
+            <div class="card-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
+                <line x1="12" y1="6" x2="12" y2="8"></line>
+                <line x1="12" y1="16" x2="12" y2="18"></line>
+              </svg>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-amount" id="netBalanceAmount">$0.00</div>
+            <div class="card-subtext" id="netBalanceSubtext">
+              Lent minus Borrowed
+            </div>
+          </div>
+        </div>
+
+        <!-- Settled & Overdue stats -->
+        <div class="summary-card card-activity">
+          <div class="card-header">
+            <div class="card-meta">
+              <span class="card-label">Settlement & Alerts</span>
+            </div>
+            <div class="card-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+          </div>
+          <div class="activity-grid">
+            <div class="activity-item">
+              <span class="activity-label">Total Settled</span>
+              <span class="activity-val text-settled" id="totalSettledAmount">$0.00</span>
+            </div>
+            <div class="activity-item">
+              <span class="activity-label">Overdue Items</span>
+              <span class="activity-val text-overdue" id="totalOverdueCount">0 items</span>
+            </div>
+            <div class="activity-item">
+              <span class="activity-label">Monthly Receivable</span>
+              <span class="activity-val" style="color:var(--color-lent);" id="totalMonthlyLent">$0.00/mo</span>
+            </div>
+            <div class="activity-item">
+              <span class="activity-label">Monthly Payable</span>
+              <span class="activity-val" style="color:var(--color-borrowed);" id="totalMonthlyBorrowed">$0.00/mo</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Main Controls & List Section -->
+      <section class="records-section">
+        
+        <!-- Controls Bar -->
+        <div class="controls-card">
+          
+          <!-- Top row: Tabs & Search -->
+          <div class="controls-top">
+            
+            <!-- Type Tabs -->
+            <div class="tab-group" role="tablist">
+              <button class="tab-btn active" data-type="ALL" role="tab" id="tabAll">
+                All Records <span class="tab-count" id="countAll">0</span>
+              </button>
+              <button class="tab-btn" data-type="LENT" role="tab" id="tabLent">
+                Money Lent <span class="tab-count" id="countLent">0</span>
+              </button>
+              <button class="tab-btn" data-type="BORROWED" role="tab" id="tabBorrowed">
+                Money Borrowed <span class="tab-count" id="countBorrowed">0</span>
+              </button>
+            </div>
+
+            <!-- Search Field -->
+            <div class="search-box">
+              <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="searchInput" placeholder="Search person, category, notes..." autocomplete="off">
+              <button id="clearSearchBtn" class="clear-search hidden" title="Clear search">×</button>
+            </div>
+
+          </div>
+
+          <!-- Bottom row: Filters & Sort -->
+          <div class="controls-bottom">
+            <div class="filter-group">
+              
+              <!-- Status Filter -->
+              <div class="filter-item">
+                <label for="filterStatus">Status:</label>
+                <select id="filterStatus" class="select-sm">
+                  <option value="ALL">All Statuses</option>
+                  <option value="ACTIVE">Active (Unsettled)</option>
+                  <option value="PARTIAL">Partially Paid</option>
+                  <option value="PAID">Fully Settled</option>
+                  <option value="OVERDUE">Overdue Only</option>
+                </select>
+              </div>
+
+              <!-- Category Filter -->
+              <div class="filter-item">
+                <label for="filterCategory">Category:</label>
+                <select id="filterCategory" class="select-sm">
+                  <option value="ALL">All Categories</option>
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+
+              <!-- Sort Filter -->
+              <div class="filter-item">
+                <label for="sortBy">Sort by:</label>
+                <select id="sortBy" class="select-sm">
+                  <option value="date-desc">Newest First</option>
+                  <option value="date-asc">Oldest First</option>
+                  <option value="due-asc">Due Date (Earliest)</option>
+                  <option value="due-desc">Due Date (Latest)</option>
+                  <option value="amount-desc">Remaining Balance (High to Low)</option>
+                  <option value="amount-asc">Remaining Balance (Low to High)</option>
+                  <option value="name-asc">Name (A–Z)</option>
+                </select>
+              </div>
+
+            </div>
+
+            <div class="quick-stats-summary" id="resultsCount">
+              Showing 0 records
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Records List / Table Area -->
+        <div class="records-container" id="recordsContainer">
+          <!-- Dynamic Items will be rendered here -->
+        </div>
+
+        <!-- Empty State (Hidden when items exist) -->
+        <div class="empty-state hidden" id="emptyState">
+          <div class="empty-state-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <h3 id="emptyTitle">No credit records found</h3>
+          <p id="emptySubtitle">Start tracking money you've lent or borrowed by adding your first record.</p>
+          <button class="btn-primary" id="emptyAddBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Add New Record
+          </button>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer no-print">
+      <p>CreditPulse &bull; Private & Secure &bull; Saved locally in your browser</p>
+    </footer>
+
+  </div>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- Add / Edit Credit Modal -->
+  <div class="modal-backdrop hidden" id="creditModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 id="creditModalTitle">Add Credit Record</h2>
+        <button type="button" class="btn-close" id="closeCreditModalBtn" aria-label="Close modal">×</button>
+      </div>
+      
+      <form id="creditForm" novalidate>
+        <input type="hidden" id="creditId">
+        <input type="hidden" id="creditType" name="creditType" value="BORROWED">
+
+        <!-- Person I Owe & Item / Purpose Grid -->
+        <div class="form-row">
+          <div class="form-group col">
+            <label for="personName" class="form-label">Person I Owe (Creditor) <span class="required">*</span></label>
+            <input type="text" id="personName" class="form-control" placeholder="e.g. Adel, John, Bank" required>
+            <span class="form-error" id="personNameError"></span>
+          </div>
+
+          <div class="form-group col">
+            <label for="itemName" class="form-label">Item / Purpose <span class="required">*</span></label>
+            <input type="text" id="itemName" class="form-control" placeholder="e.g. PSU, Laptop, Tuition, Rent" required>
+            <span class="form-error" id="itemNameError"></span>
+          </div>
+        </div>
+
+        <!-- Amount & Initial Paid Grid -->
+        <div class="form-row">
+          <div class="form-group col">
+            <label for="creditAmount" class="form-label">Total Amount <span class="required">*</span></label>
+            <div class="input-prefix-wrapper">
+              <span class="input-prefix" id="currencyPrefix">$</span>
+              <input type="number" id="creditAmount" class="form-control with-prefix" placeholder="0.00" min="0.01" step="any" required>
+            </div>
+            <span class="form-error" id="creditAmountError"></span>
+          </div>
+
+          <div class="form-group col" id="initialPaidGroup">
+            <label for="initialPaid" class="form-label">Initial Paid / Deposited</label>
+            <div class="input-prefix-wrapper">
+              <span class="input-prefix" id="currencyPrefixPaid">$</span>
+              <input type="number" id="initialPaid" class="form-control with-prefix" placeholder="0.00" min="0" step="any">
+            </div>
+            <span class="form-hint">Optional initial payment</span>
+          </div>
+        </div>
+
+        <!-- Monthly Payment / Installment Plan Grid -->
+        <div class="form-row">
+          <div class="form-group col">
+            <label for="monthlyAmount" class="form-label">Monthly Repayment Amount</label>
+            <div class="input-prefix-wrapper">
+              <span class="input-prefix" id="currencyPrefixMonthly">$</span>
+              <input type="number" id="monthlyAmount" class="form-control with-prefix" placeholder="e.g. 100.00" min="0" step="any">
+            </div>
+            <span class="form-hint">Amount expected to be paid each month</span>
+          </div>
+
+          <div class="form-group col">
+            <label for="installmentTenure" class="form-label">Split Over Months (Plan Helper)</label>
+            <select id="installmentTenure" class="form-control">
+              <option value="">Custom Monthly Amount</option>
+              <option value="3">3 Months (Quarterly)</option>
+              <option value="6">6 Months (Half Year)</option>
+              <option value="12">12 Months (1 Year)</option>
+              <option value="24">24 Months (2 Years)</option>
+              <option value="36">36 Months (3 Years)</option>
+            </select>
+            <span class="form-hint" id="tenureCalcHint">Auto-calculates monthly amount</span>
+          </div>
+        </div>
+
+        <!-- Date & Due Date Grid -->
+        <div class="form-row">
+          <div class="form-group col">
+            <label for="issueDate" class="form-label">Date Issued <span class="required">*</span></label>
+            <input type="date" id="issueDate" class="form-control" required>
+          </div>
+
+          <div class="form-group col">
+            <label for="dueDate" class="form-label">Payment Due Date</label>
+            <input type="date" id="dueDate" class="form-control">
+            <div class="date-presets-group">
+              <button type="button" class="btn-preset" data-preset="7">+7 Days</button>
+              <button type="button" class="btn-preset" data-preset="14">+14 Days</button>
+              <button type="button" class="btn-preset" data-preset="30">+30 Days</button>
+              <button type="button" class="btn-preset" data-preset="month-end">Month End</button>
+            </div>
+            <span class="form-hint">Set expected repayment deadline</span>
+          </div>
+        </div>
+
+        <!-- Category & Tag -->
+        <div class="form-row">
+          <div class="form-group col">
+            <label for="creditCategory" class="form-label">Category</label>
+            <select id="creditCategory" class="form-control">
+              <option value="Personal">Personal</option>
+              <option value="Friends & Family">Friends & Family</option>
+              <option value="Business & Work">Business & Work</option>
+              <option value="Bills & Utilities">Bills & Utilities</option>
+              <option value="Emergency">Emergency</option>
+              <option value="Shopping & Gadget">Shopping & Gadget</option>
+              <option value="Loan / Installment">Loan / Installment</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group col">
+            <label for="contactInfo" class="form-label">Contact / Phone (Optional)</label>
+            <input type="text" id="contactInfo" class="form-control" placeholder="e.g. +1 555-0192 / @alex">
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group">
+          <label for="creditNotes" class="form-label">Notes / Terms</label>
+          <textarea id="creditNotes" class="form-control" rows="2" placeholder="e.g. Repay by month-end, 0% interest, for travel expenses..."></textarea>
+        </div>
+
+        <!-- Initial Credit Document / Agreement Image Upload -->
+        <div class="form-group">
+          <label class="form-label">Attached Document / Invoice / Loan Agreement Image (Optional)</label>
+          <div class="receipt-upload-box" id="creditDocUploadBox">
+            <input type="file" id="creditDocImageInput" accept="image/*" class="hidden">
+            <div class="upload-placeholder" id="creditDocPlaceholder">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+              <span>Click or drag image to attach agreement/invoice/receipt</span>
+              <small class="text-muted">JPG, PNG, WebP</small>
+            </div>
+            <div class="receipt-preview-wrapper hidden" id="creditDocPreviewWrapper">
+              <img id="creditDocPreviewImg" src="" alt="Credit Agreement Preview">
+              <div class="receipt-preview-actions">
+                <button type="button" class="btn-sm btn-secondary" id="changeCreditDocBtn">Change Image</button>
+                <button type="button" class="btn-sm btn-danger" id="removeCreditDocBtn">Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelCreditModalBtn">Cancel</button>
+          <button type="submit" class="btn-primary" id="saveCreditBtn">Save Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Record / Edit Payment Modal -->
+  <div class="modal-backdrop hidden" id="paymentModal">
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <h2 id="paymentModalTitle">Record Payment</h2>
+        <button type="button" class="btn-close" id="closePaymentModalBtn" aria-label="Close modal">×</button>
+      </div>
+
+      <form id="paymentForm" novalidate>
+        <input type="hidden" id="paymentRecordId">
+        <input type="hidden" id="editPaymentId">
+
+        <div class="payment-info-banner" id="paymentBanner">
+          <div class="banner-person" id="payPersonName">Name</div>
+          <div class="banner-stats">
+            <div>Total: <span id="payTotalAmount">$0.00</span></div>
+            <div id="payMonthlyGuideGroup" class="hidden">Monthly Guide: <strong style="color:var(--color-primary);" id="payMonthlyGuideAmount">$0.00/mo</strong></div>
+            <div>Remaining: <strong class="text-highlight" id="payRemainingAmount">$0.00</strong></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="flex-between">
+            <label for="paymentAmount" class="form-label">Payment Amount <span class="required">*</span></label>
+            <div class="flex-align-center gap-8" style="flex-wrap: wrap; justify-content: flex-end;">
+              <button type="button" class="btn-text hidden" id="payMonthlyAmountBtn">Pay Monthly (₱0.00)</button>
+              <button type="button" class="btn-text hidden" id="payAdvance2Btn">⚡ 2 Mos Advance</button>
+              <button type="button" class="btn-text" id="payFullAmountBtn">Pay Full Balance</button>
+            </div>
+          </div>
+          <div class="input-prefix-wrapper">
+            <span class="input-prefix" id="payCurrencyPrefix">$</span>
+            <input type="number" id="paymentAmount" class="form-control with-prefix" placeholder="0.00" min="0.01" step="any" required>
+          </div>
+          <span class="form-error" id="paymentAmountError"></span>
+        </div>
+
+        <div id="earlyPaymentNotice" class="early-pay-notice hidden">
+          <span class="early-pay-icon">⚡</span>
+          <span id="earlyPaymentNoticeText">Paying in advance / early!</span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col">
+            <label for="paymentDate" class="form-label">Payment Date <span class="required">*</span></label>
+            <input type="date" id="paymentDate" class="form-control" required>
+          </div>
+
+          <div class="form-group col">
+            <label for="paymentMethod" class="form-label">Payment Method / Channel</label>
+            <select id="paymentMethod" class="form-control">
+              <option value="Bank Transfer">Bank Transfer / Online</option>
+              <option value="Cash">Cash</option>
+              <option value="E-Wallet (Venmo / GCash / PayPal)">E-Wallet (Venmo/GCash/PayPal)</option>
+              <option value="Credit/Debit Card">Credit/Debit Card</option>
+              <option value="Check">Check</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col">
+            <label for="paymentNote" class="form-label">Payment Reference / Note</label>
+            <input type="text" id="paymentNote" class="form-control" placeholder="e.g. Ref #TRX-94821, Final installment, etc.">
+          </div>
+
+          <div class="form-group col" id="nextDueDateGroup">
+            <label for="nextPaymentDueDate" class="form-label">Next Payment Due Date</label>
+            <input type="date" id="nextPaymentDueDate" class="form-control">
+            <div class="date-presets-group">
+              <button type="button" class="btn-preset" data-target="nextPaymentDueDate" data-preset="7">+7d</button>
+              <button type="button" class="btn-preset" data-target="nextPaymentDueDate" data-preset="14">+14d</button>
+              <button type="button" class="btn-preset" data-target="nextPaymentDueDate" data-preset="30">+30d</button>
+            </div>
+            <span class="form-hint">Update next repayment deadline</span>
+          </div>
+        </div>
+
+        <!-- Proof of Payment / Receipt Image Upload -->
+        <div class="form-group">
+          <label class="form-label">Attached Proof of Payment / Receipt Image</label>
+          <div class="receipt-upload-box" id="receiptUploadBox">
+            <input type="file" id="receiptImageInput" accept="image/*" class="hidden">
+            <div class="upload-placeholder" id="receiptPlaceholder">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+              <span>Click or drag image to attach payment screenshot/receipt</span>
+              <small class="text-muted">JPG, PNG, WebP</small>
+            </div>
+            <div class="receipt-preview-wrapper hidden" id="receiptPreviewWrapper">
+              <img id="receiptPreviewImg" src="" alt="Proof of Payment Preview">
+              <div class="receipt-preview-actions">
+                <button type="button" class="btn-sm btn-secondary" id="changeReceiptBtn">Change Image</button>
+                <button type="button" class="btn-sm btn-danger" id="removeReceiptBtn">Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelPaymentModalBtn">Cancel</button>
+          <button type="submit" class="btn-primary" id="savePaymentBtn">Confirm & Save Payment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Share Proof & Payment Summary Voucher Modal -->
+  <div class="modal-backdrop hidden" id="proofModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header no-print">
+        <div class="flex-align-center gap-8">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--color-lent)">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <h2 id="proofModalHeaderTitle">Proof of Payment Summary</h2>
+        </div>
+        <button type="button" class="btn-close" id="closeProofModalBtn" aria-label="Close modal">×</button>
+      </div>
+
+      <!-- Mode Selector (Full History Statement vs Single Payment) -->
+      <div class="voucher-mode-bar no-print">
+        <div class="tab-group" id="proofViewModeTabs">
+          <button type="button" class="tab-btn active" id="btnModeAllHistory" data-mode="all">
+            📜 Full History Statement (All Proofs)
+          </button>
+          <button type="button" class="tab-btn" id="btnModeSinglePayment" data-mode="single">
+            📄 Single Payment Voucher
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Printable Voucher Area -->
+        <div class="receipt-voucher-card" id="receiptVoucherArea">
+          
+          <div class="voucher-top">
+            <div class="voucher-brand">
+              <div class="voucher-logo">CP</div>
+              <div>
+                <h3>CreditPulse</h3>
+                <span class="voucher-type-tag" id="voucherDocType">Complete Payment Statement</span>
+              </div>
+            </div>
+            <div class="voucher-meta">
+              <div class="voucher-ref" id="voucherRefId">REF: #CP-82910</div>
+              <div class="voucher-date" id="voucherDate">Date: Jan 15, 2026</div>
+            </div>
+          </div>
+
+          <div class="voucher-divider"></div>
+
+          <!-- Parties (Payer & Payee) -->
+          <div class="voucher-parties">
+            <div class="party-col">
+              <span class="party-label">From (Payer):</span>
+              <strong class="party-name" id="voucherPayer">Me</strong>
+            </div>
+            <div class="party-arrow">➔</div>
+            <div class="party-col">
+              <span class="party-label" id="voucherPayeeLabel">To (Creditor):</span>
+              <strong class="party-name" id="voucherPayee">Person Name</strong>
+              <span class="party-sub" id="voucherPayeeContact">Contact</span>
+            </div>
+          </div>
+
+          <!-- Payment Amount Banner -->
+          <div class="voucher-amount-box">
+            <span class="voucher-amount-label" id="voucherAmountHeaderLabel">Total Paid To Date</span>
+            <div class="voucher-big-amount" id="voucherAmount">$0.00</div>
+            <span class="voucher-status-pill" id="voucherStatusPill">FULLY SETTLED</span>
+          </div>
+
+          <!-- Breakdown Summary Details -->
+          <div class="voucher-breakdown">
+            <div class="breakdown-row" id="voucherItemRow">
+              <span>Item / Purpose:</span>
+              <strong id="voucherItemName" class="text-highlight">Item Name</strong>
+            </div>
+            <div class="breakdown-row">
+              <span>Original Credit / Loan:</span>
+              <strong id="voucherOriginalAmount">$0.00</strong>
+            </div>
+            <div class="breakdown-row" id="voucherSingleMethodRow">
+              <span>Payment Channel & Method:</span>
+              <strong id="voucherMethod">Bank Transfer</strong>
+            </div>
+            <div class="breakdown-row" id="voucherSingleNoteRow">
+              <span>Payment Note:</span>
+              <span id="voucherNote">Settlement</span>
+            </div>
+            <div class="breakdown-row" id="voucherNextDueRow">
+              <span>Next Payment Due Date:</span>
+              <strong id="voucherNextDueDate" class="text-highlight">Aug 30, 2026</strong>
+            </div>
+            <div class="breakdown-row" id="voucherMonthlyRow">
+              <span>Monthly Payment Plan:</span>
+              <strong id="voucherMonthlyAmount" class="text-highlight">$0.00 / month</strong>
+            </div>
+            <div class="breakdown-row highlight-row">
+              <span>Remaining Outstanding Balance:</span>
+              <strong id="voucherRemainingAmount">$0.00</strong>
+            </div>
+          </div>
+
+          <!-- Full History Itemized Table (Visible in History Statement mode) -->
+          <div class="voucher-history-table-wrapper" id="voucherHistoryTableSection">
+            <div class="proof-section-header">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+              </svg>
+              <span>Itemized Payment History Log</span>
+            </div>
+            <table class="voucher-ledger-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Method & Note</th>
+                  <th>Proof Receipt</th>
+                  <th style="text-align:right;">Amount Paid</th>
+                </tr>
+              </thead>
+              <tbody id="voucherLedgerBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Proof Image(s) Gallery Section -->
+          <div class="voucher-proof-section" id="voucherProofSection">
+            <div class="proof-section-header" style="justify-content: space-between;">
+              <div class="flex-align-center gap-6">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                <span id="voucherProofHeaderTitle">Attached Proof & Receipt Images</span>
+              </div>
+              <button type="button" class="btn-action btn-sm no-print" id="attachProofToRecordBtn" title="Upload a proof receipt image for this record">
+                ➕ Attach Proof Image
+              </button>
+            </div>
+            
+            <!-- Hidden inline input for attaching receipts -->
+            <input type="file" id="inlineReceiptInput" accept="image/*" class="hidden">
+
+            <!-- Dynamic Receipt Gallery Grid -->
+            <div class="voucher-gallery-grid" id="voucherGalleryGrid">
+              <!-- Dynamically populated images -->
+            </div>
+          </div>
+
+          <div class="voucher-footer-note">
+            <span>This serves as official verification and complete record of payment transactions. Generated with CreditPulse.</span>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Modal Actions (WhatsApp, Email, Copy, Print) -->
+      <div class="modal-footer share-footer no-print">
+        <div class="share-actions-group">
+          <button type="button" class="btn-secondary" id="copySummaryTextBtn" title="Copy text receipt to paste anywhere">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            Copy Text
+          </button>
+
+          <button type="button" class="btn-secondary" id="downloadAllImagesBtn" title="Download all attached receipt images">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download Receipts
+          </button>
+
+          <button type="button" class="btn-whatsapp" id="shareWhatsappBtn" title="Send summary directly via WhatsApp">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+            </svg>
+            WhatsApp
+          </button>
+
+          <button type="button" class="btn-secondary" id="shareEmailBtn" title="Send formatted email">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            Email
+          </button>
+
+          <button type="button" class="btn-secondary" id="saveLongImageBtn" title="Save entire statement as one continuous long image (100% Zero Page Cuts)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            Save Long-Form
+          </button>
+
+          <button type="button" class="btn-primary" id="printReceiptBtn" title="Print receipt or save as PDF">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            Print / Save PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Lightbox Modal for full receipt view -->
+  <div class="modal-backdrop hidden" id="lightboxModal">
+    <div class="lightbox-dialog">
+      <div class="lightbox-toolbar no-print">
+        <button type="button" class="btn-secondary btn-sm" id="copyLightboxImgBtn" title="Copy receipt image to clipboard">
+          📋 Copy Image
+        </button>
+        <button type="button" class="btn-secondary btn-sm" id="downloadLightboxImgBtn" title="Download receipt image">
+          💾 Download
+        </button>
+        <button type="button" class="btn-close lightbox-close-btn" id="closeLightboxBtn">×</button>
+      </div>
+      <img id="lightboxImg" src="" alt="Full Receipt View">
+    </div>
+  </div>
+
+  <!-- Payment History & Details View Modal -->
+  <div class="modal-backdrop hidden" id="detailsModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2>Credit Details & History</h2>
+        <button type="button" class="btn-close" id="closeDetailsModalBtn" aria-label="Close modal">×</button>
+      </div>
+      <div class="modal-body" id="detailsModalContent">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="closeDetailsBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Management Modal (Export / Import / Reset) -->
+  <div class="modal-backdrop hidden" id="dataModal">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-header">
+        <h2>Data Management</h2>
+        <button type="button" class="btn-close" id="closeDataModalBtn" aria-label="Close modal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="data-actions-list">
+          
+          <div class="data-action-item">
+            <div class="data-action-desc">
+              <strong>Export Backup (JSON)</strong>
+              <small>Download complete credit and payment records with receipts.</small>
+            </div>
+            <button class="btn-secondary btn-sm" id="exportJsonBtn">Download JSON</button>
+          </div>
+
+          <div class="data-action-item">
+            <div class="data-action-desc">
+              <strong>Export Spreadsheet (CSV)</strong>
+              <small>Download transactions table for Excel or Google Sheets.</small>
+            </div>
+            <button class="btn-secondary btn-sm" id="exportCsvBtn">Download CSV</button>
+          </div>
+
+          <div class="data-action-item">
+            <div class="data-action-desc">
+              <strong>Import Backup (JSON)</strong>
+              <small>Restore data from an existing JSON backup file.</small>
+            </div>
+            <label class="btn-secondary btn-sm file-upload-label">
+              Upload JSON
+              <input type="file" id="importFileInput" accept=".json" class="hidden">
+            </label>
+          </div>
+
+          <div class="data-action-divider"></div>
+
+          <div class="data-action-item danger-item">
+            <div class="data-action-desc">
+              <strong class="text-danger">Load Demo Data</strong>
+              <small>Populate with realistic sample loans and credit entries.</small>
+            </div>
+            <button class="btn-secondary btn-sm" id="loadDemoBtn">Load Samples</button>
+          </div>
+
+          <div class="data-action-item danger-item">
+            <div class="data-action-desc">
+              <strong class="text-danger">Reset All Data</strong>
+              <small>Permanently delete all stored credits and payment history.</small>
+            </div>
+            <button class="btn-danger btn-sm" id="resetAllBtn">Clear All</button>
+          </div>
+
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="doneDataModalBtn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-backdrop hidden" id="deleteModal">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-header">
+        <h2 class="text-danger">Delete Record</h2>
+        <button type="button" class="btn-close" id="closeDeleteModalBtn" aria-label="Close modal">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this credit record for <strong id="deleteTargetName"></strong>?</p>
+        <p class="text-muted text-sm">This action cannot be undone and will also delete its payment history.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="cancelDeleteBtn">Cancel</button>
+        <button type="button" class="btn-danger" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container no-print" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
